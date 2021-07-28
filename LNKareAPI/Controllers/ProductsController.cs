@@ -15,10 +15,12 @@ namespace LNKareAPI.Controllers
     {
         private readonly IProductRepository _productRepo;
         private readonly ICategoryRepository _categoryRepo;
-        public ProductsController(IProductRepository productRepo, ICategoryRepository categoryRepo)
+        private readonly IImageProductRepository _imgRepo;
+        public ProductsController(IProductRepository productRepo, ICategoryRepository categoryRepo, IImageProductRepository imgRepo)
         {
             _productRepo = productRepo;
             _categoryRepo = categoryRepo;
+            _imgRepo = imgRepo;
         }
         [HttpGet]
         public IActionResult GetProducts()
@@ -48,12 +50,13 @@ namespace LNKareAPI.Controllers
                 ModelState.AddModelError("", "Product Exsits");
                 return StatusCode(404, ModelState);
             }
-            if (!_productRepo.CreateProduct(product))
+            var obj = _productRepo.CreateProduct(product);
+            if (obj == null)
             {
                 ModelState.AddModelError("", "Something Wrong When Create Product");
                 return StatusCode(500, ModelState);
             }
-            return Ok();
+            return CreatedAtRoute("GetProduct",new {productId = obj.Id},obj);
         }
         [HttpPatch("{productId:int}",Name ="UpdateProduct")]
         public IActionResult UpdateProduct(int productId, Product product)

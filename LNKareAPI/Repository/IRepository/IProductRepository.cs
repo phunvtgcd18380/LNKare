@@ -10,8 +10,9 @@ namespace LNKareAPI.Repository.IRepository
     {
         ICollection<Product> GetProducts();
         Product GetProduct(int productId);
+        Product GetProduct(string productName);
         bool ProductExists(string productName);
-        bool CreateProduct(Product product);
+        Product CreateProduct(Product product);
         bool UpdateProduct(Product product);
         bool DeleteProduct(Product product);
         bool Save();

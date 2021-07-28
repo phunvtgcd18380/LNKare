@@ -16,7 +16,7 @@ namespace LNKareAPI.Repository
         {
             _db = db;
         }
-        public bool CreateProduct(Product product)
+        public Product CreateProduct(Product product)
         {
             var categoryFromDb = _db.Categories.FirstOrDefault(i => i.Id == product.CategoryId);
             if(categoryFromDb != null)
@@ -29,9 +29,12 @@ namespace LNKareAPI.Repository
                     Category = categoryFromDb
                 };
                 _db.Products.Add(product1);
-                return Save();
+                if (Save())
+                {
+                    return GetProduct(product.Name);
+                }
             }
-            return false;
+            return null;
         }
 
         public bool DeleteProduct(Product product)
@@ -44,8 +47,10 @@ namespace LNKareAPI.Repository
         {
             return _db.Products.Include(i => i.Category).FirstOrDefault(i => i.Id == productId);
         }
-
-
+        public Product GetProduct(string productName)
+        {
+            return _db.Products.Include(i => i.Category).FirstOrDefault(i => i.Name.Trim().ToLower() == productName.Trim().ToLower());
+        }
         public ICollection<Product> GetProducts()
         {
             return _db.Products.Include(i => i.Category).ToList();
